@@ -32,16 +32,46 @@ public:
 
 class Trunk : public GameObject
 {
+	unsigned int lane;
 public:
 	//bool move_left;
 	virtual ~Trunk() { SDL_Log("Trunk::~Trunk"); }
 	
-	virtual void Init(double xPos, double yPos)
+	virtual void Create(unsigned int lane)
+	{
+		this->lane = lane;
+	}
+	virtual void Init(/*double xPos, double yPos*/)
 	{
 		SDL_Log("Trunk::Init");
 		GameObject::Init();
-		horizontalPosition = xPos;
-		verticalPosition = yPos;
+		/*horizontalPosition = xPos;
+		verticalPosition = yPos;*/
+		switch (lane)
+		{
+		case 0:
+			horizontalPosition = 0;
+			verticalPosition = 325;
+			break;
+		case 1:
+			horizontalPosition = 640;
+			verticalPosition = 285;
+			break;
+		case 2:
+			horizontalPosition = 0;
+			verticalPosition = 245;
+			break;
+		case 3:
+			horizontalPosition = 640;
+			verticalPosition = 205;
+			break;
+		case 4:
+			horizontalPosition = 0;
+			verticalPosition = 165;
+			break;
+		default:
+			return;
+		}
 	}
 
 };

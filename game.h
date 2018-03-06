@@ -9,7 +9,8 @@ class Game : public GameObject
 	float time_car_launched;
 
 	ObjectPool<Car> car_pool;
-	ObjectPool<Trunk> trunk_pools[5];
+	ObjectPool<Trunk> trunk_pool;
+	//ObjectPool<Trunk> trunk_pools[5];
 	//ObjectPool<Car> car_pools[5];
 
 	Player * player;
@@ -58,8 +59,6 @@ public:
 		CollideComponent * player_car_collider = new CollideComponent();
 		player_car_collider->Create(system, player, &game_objects, (ObjectPool<GameObject>*)&car_pool);
 		player->AddComponent(player_car_collider);
-		// TODO: create the river (maybe) I don't think I need this - either make collision more sophisticated or just make a hard check if frogger jumps into river
-
 		// TODO: DO NOT FORGET TO PROPERLY FREE MEMORY
 		// creates trunks in the river
 		initialiseTrunks();
@@ -91,9 +90,29 @@ public:
 			counter++;
 		}
 	}
+
+	void initialiseTrunks()
+	{
+		trunk_pool.Create(25);
+		unsigned int counter = 0;
+		for (auto trunk = trunk_pool.pool.begin(); trunk != trunk_pool.pool.end(); trunk++)
+		{
+			bool mvlft = false;
+			if (counter % 5 == 1 || counter % 5 == 3)
+				mvlft = true;
+			CarBehaviourComponent * behaviour = new CarBehaviourComponent();
+			behaviour->Create(system, *trunk, &game_objects, mvlft);
+			RenderComponent * render = new RenderComponent();
+			render->Create(system, *trunk, &game_objects, "data/trunk.bmp");
+			(*trunk)->Create(counter % 5);
+			(*trunk)->AddComponent(behaviour);
+			(*trunk)->AddComponent(render);
+			counter++;
+		}
+	}
 	
 	// TODO: refactor car and trunk pool creation to be modular
-	ObjectPool<Trunk> * initialiseTrunkPool(bool mvlft)
+	/*ObjectPool<Trunk> * initialiseTrunkPool(bool mvlft)
 	{
 		ObjectPool<Trunk> * trnk_pl = new ObjectPool<Trunk>();
 		trnk_pl->Create(5);
@@ -108,43 +127,23 @@ public:
 			(*trnk)->AddComponent(render);
 		}
 		return trnk_pl;
-	}
+	}*/
 
 	void randomTrunk(unsigned int lane)
 	{
 		if (fRand(0, 1) < 0.1 && canTrunk())
 		{
-			Trunk * trunk = trunk_pools[lane].FirstAvailable();
+			Trunk * trunk = trunk_pool.FirstAvailable();
 			if (trunk != NULL)
 			{
-				switch (lane)
-				{
-				case 0:
-					trunk->Init(0, 325);
-					break;
-				case 1:
-					trunk->Init(640, 285);
-					break;
-				case 2:
-					trunk->Init(0, 245);
-					break;
-				case 3:
-					trunk->Init(640, 205);
-					break;
-				case 4:
-					trunk->Init(0, 165);
-					break;
-				default:
-					SDL_Log("error initialising trunk");
-					break;
-				}
-				//trunk->Init(0, 325); //TODO: find coordinates for correct river lanes
+				trunk->Init();
 				game_objects.insert(trunk);
 			}
+
 		}
 	}
 
-	void initialiseTrunks()
+	/*void initialiseTrunks()
 	{
 		for (unsigned int pool = 0; pool < 5; pool++) 
 		{
@@ -154,7 +153,7 @@ public:
 				trunk_pools[pool] = *initialiseTrunkPool(true);
 		}
 	}
-
+	*/
 	virtual void Init()
 	{
 		time_trunk_launched = -10000.f;
@@ -219,41 +218,6 @@ public:
 				
 		}
 	}
-	/*
-	void randomCar(unsigned int lane)
-	{
-		if (fRand(0, 1) < 0.1 && canCar())
-		{
-			Car * car = car_pools[lane].FirstAvailable();
-			if (car != NULL)
-			{
-				switch (lane)
-				{
-				case 0:
-					car->Init(0, 565);
-					break;
-				case 1:
-					car->Init(640, 525);
-					break;
-				case 2:
-					car->Init(0, 485);
-					break;
-				case 3:
-					car->Init(640, 445);
-					break;
-				case 4:
-					car->Init(0, 405);
-					break;
-				default:
-					SDL_Log("error initialising car");
-					break;
-				}
-				game_objects.insert(car);
-			}
-		}
-	}*/
-
-	
 
 	double fRand(double fMin, double fMax)
 	{
@@ -265,8 +229,8 @@ public:
 	{
 
 		char msg[1024];
-		sprintf(msg, "%07d", Score());
-		system->drawText(300, 4, msg);
+		//sprintf(msg, "%07d", Score());
+		//system->drawText(300, 4, msg);
 		sprintf(msg, "bonus: %.1fX", game_speed);
 		system->drawText(510, 4, msg);
 
@@ -321,11 +285,12 @@ public:
 		life_sprite->destroy();
 
 		// free memory
-		for (int i = 0; i < 5; i++)
+		/*for (int i = 0; i < 5; i++)
 		{
 			trunk_pools[i].Destroy();
 		}
-		trunk_pools->Destroy();
+		trunk_pools->Destroy();*/
+		trunk_pool.Destroy();
 		car_pool.Destroy();
 
 		player->Destroy();

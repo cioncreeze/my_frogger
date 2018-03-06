@@ -148,13 +148,16 @@ public:
 	// TODO: lives are actually frogs that have to go to the other side
 
 
-	virtual ~Player()	{		SDL_Log("Player::~Player");	}
+	virtual ~Player() { SDL_Log("Player::~Player"); }
 
+	virtual void Create()
+	{
+		lives = NUM_LIVES;
+	}
 	virtual void Init()
 	{
 		SDL_Log("Player::Init");
 		GameObject::Init();
-		lives = NUM_LIVES;
 		horizontalPosition = 320 - 18;
 		verticalPosition = 640 - 36;
 	}
@@ -168,6 +171,9 @@ public:
 
 			if (lives < 0)
 				Send(GAME_OVER);
+			this->Init();
+
+
 		}
 	}
 
