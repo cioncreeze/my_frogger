@@ -8,26 +8,13 @@ class Game : public GameObject
 	float time_trunk_launched;
 	float time_car_launched;
 
+	ObjectPool<Car> car_pool;
 	ObjectPool<Trunk> trunk_pools[5];
-	/*
-	ObjectPool<Trunk> trunks_pool_1;
-	ObjectPool<Trunk> trunks_pool_2;
-	ObjectPool<Trunk> trunks_pool_3;
-	ObjectPool<Trunk> trunks_pool_4;
-	ObjectPool<Trunk> trunks_pool_5;
-	*/
-
-	ObjectPool<Car> car_pool_1;
-	ObjectPool<Car> car_pool_2;
-	ObjectPool<Car> car_pool_3;
-	ObjectPool<Car> car_pool_4;
-	ObjectPool<Car> car_pool_5;
+	//ObjectPool<Car> car_pools[5];
 
 	Player * player;
 
 	Background * bg;
-
-	//River * river; 
 
 	Sprite * life_sprite;
 	bool game_over; // TODO: implement proper game over calls
@@ -43,8 +30,6 @@ public:
 
 		this->system = system;
 
-
-		/**/
 		// create background
 		bg = new Background();
 		// TODO: background behaviour component necessary?
@@ -56,8 +41,6 @@ public:
 		bg->AddComponent(bg_behaviour);
 		bg->AddComponent(bg_render);
 		bg->AddReceiver(this);
-		//game_objects.insert(bg);
-		/**/
 
 		// player creation, component creation
 		player = new Player();
@@ -71,6 +54,10 @@ public:
 		player->AddComponent(player_render);
 		player->AddReceiver(this);
 		game_objects.insert(player);
+
+		CollideComponent * player_car_collider = new CollideComponent();
+		player_car_collider->Create(system, player, &game_objects, (ObjectPool<GameObject>*)&car_pool);
+		player->AddComponent(player_car_collider);
 		// TODO: create the river (maybe) I don't think I need this - either make collision more sophisticated or just make a hard check if frogger jumps into river
 
 		// TODO: DO NOT FORGET TO PROPERLY FREE MEMORY
@@ -78,72 +65,33 @@ public:
 		initialiseTrunks();
 		// creates cars on the street
 		initialiseCars();
+
 		// TODO: create 5 lanes of  gators, turtles, snakes
 
 		life_sprite = system->createSprite("data/frogger.bmp");
 		score = 0;
 	}
-	 
+	
 	void initialiseCars()
 	{
-		car_pool_1.Create(5);
-		for (auto car = car_pool_1.pool.begin(); car != car_pool_1.pool.end(); car++)
+		car_pool.Create(25);
+		unsigned int counter = 0;
+		for (auto car = car_pool.pool.begin(); car != car_pool.pool.end(); car++)
 		{
+			bool mvlft = false;
+			if (counter % 5 == 1 || counter % 5 == 3)
+				mvlft = true;
 			CarBehaviourComponent * behaviour = new CarBehaviourComponent();
-			behaviour->Create(system, *car, &game_objects, false);
+			behaviour->Create(system, *car, &game_objects, mvlft);
 			RenderComponent * render = new RenderComponent();
 			render->Create(system, *car, &game_objects, "data/car.bmp");
-			(*car)->Create();
+			(*car)->Create(counter % 5);
 			(*car)->AddComponent(behaviour);
 			(*car)->AddComponent(render);
-		}
-
-		car_pool_2.Create(5);
-
-		for (auto car= car_pool_2.pool.begin(); car != car_pool_2.pool.end(); car++)
-		{
-			CarBehaviourComponent * behaviour = new CarBehaviourComponent();
-			behaviour->Create(system, *car, &game_objects, true);
-			RenderComponent * render = new RenderComponent();
-			render->Create(system, *car, &game_objects, "data/car.bmp");
-			(*car)->Create();
-			(*car)->AddComponent(behaviour);
-			(*car)->AddComponent(render);
-		}
-		car_pool_3.Create(5);
-		for (auto car = car_pool_3.pool.begin(); car != car_pool_3.pool.end(); car++)
-		{
-			CarBehaviourComponent * behaviour = new CarBehaviourComponent();
-			behaviour->Create(system, *car, &game_objects, false);
-			RenderComponent * render = new RenderComponent();
-			render->Create(system, *car, &game_objects, "data/car.bmp");
-			(*car)->Create();
-			(*car)->AddComponent(behaviour);
-			(*car)->AddComponent(render);
-		}
-		car_pool_4.Create(5);
-		for (auto car = car_pool_4.pool.begin(); car != car_pool_4.pool.end(); car++)
-		{
-			CarBehaviourComponent * behaviour = new CarBehaviourComponent();
-			behaviour->Create(system, *car, &game_objects, true);
-			RenderComponent * render = new RenderComponent();
-			render->Create(system, *car, &game_objects, "data/car.bmp");
-			(*car)->Create();
-			(*car)->AddComponent(behaviour);
-			(*car)->AddComponent(render);
-		}
-		car_pool_5.Create(5);
-		for (auto car = car_pool_5.pool.begin(); car != car_pool_5.pool.end(); car++)
-		{
-			CarBehaviourComponent * behaviour = new CarBehaviourComponent();
-			behaviour->Create(system, *car, &game_objects, false);
-			RenderComponent * render = new RenderComponent();
-			render->Create(system, *car, &game_objects, "data/car.bmp");
-			(*car)->Create();
-			(*car)->AddComponent(behaviour);
-			(*car)->AddComponent(render);
+			counter++;
 		}
 	}
+	
 	// TODO: refactor car and trunk pool creation to be modular
 	ObjectPool<Trunk> * initialiseTrunkPool(bool mvlft)
 	{
@@ -194,68 +142,6 @@ public:
 				game_objects.insert(trunk);
 			}
 		}
-		/*
-		switch (lane)
-		{
-		case 0:
-			if (fRand(0, 1) < 0.07 && canTrunk())
-			{
-				Trunk * trunk = trunks_pool_1.FirstAvailable();
-				if (trunk != NULL)
-				{
-						trunk->Init(0, 325);
-						game_objects.insert(trunk);
-				}
-			}
-			break;
-		case 1:
-			if (fRand(0, 1) < 0.07 && canTrunk())
-			{
-				Trunk * trunk = trunks_pool_2.FirstAvailable();
-				if (trunk != NULL)
-				{
-					trunk->Init(640, 285); //TODO: find coordinates for correct river lanes
-					game_objects.insert(trunk);
-				}
-			}
-			break;
-		case 2:
-			if (fRand(0, 1) < 0.07 && canTrunk())
-			{
-				Trunk * trunk = trunks_pool_3.FirstAvailable();
-				if (trunk != NULL)
-				{
-					trunk->Init(0, 245); //TODO: find coordinates for correct river lanes
-					game_objects.insert(trunk);
-				}
-			}
-			break;
-		case 3:
-			if (fRand(0, 1) < 0.07 && canTrunk())
-			{
-				Trunk * trunk = trunks_pool_4.FirstAvailable();
-				if (trunk != NULL)
-				{
-					trunk->Init(640, 205); //TODO: find coordinates for correct river lanes
-					game_objects.insert(trunk);
-				}
-			}
-			break;
-		case 4:
-			if (fRand(0, 1) < 0.07 && canTrunk())
-			{
-				Trunk * trunk = trunks_pool_5.FirstAvailable();
-				if (trunk != NULL)
-				{
-					trunk->Init(0, 165); //TODO: find coordinates for correct river lanes
-					game_objects.insert(trunk);
-				}
-			}
-			break;
-		default:
-			return;
-		}
-		*/
 	}
 
 	void initialiseTrunks()
@@ -267,63 +153,6 @@ public:
 			else
 				trunk_pools[pool] = *initialiseTrunkPool(true);
 		}
-		/*
-		trunks_pool_1.Create(5);
-		for (auto trunk = trunks_pool_1.pool.begin(); trunk != trunks_pool_1.pool.end(); trunk++)
-		{
-			TrunkBehaviourComponent * behaviour = new TrunkBehaviourComponent();
-			behaviour->Create(system, *trunk, &game_objects, false);
-			RenderComponent * render = new RenderComponent();
-			render->Create(system, *trunk, &game_objects, "data/trunk.bmp");
-			(*trunk)->Create();
-			(*trunk)->AddComponent(behaviour);
-			(*trunk)->AddComponent(render);
-		}
-		trunks_pool_2.Create(5);
-		for (auto trunk = trunks_pool_2.pool.begin(); trunk != trunks_pool_2.pool.end(); trunk++)
-		{
-			TrunkBehaviourComponent * behaviour = new TrunkBehaviourComponent();
-			behaviour->Create(system, *trunk, &game_objects, true);
-			RenderComponent * render = new RenderComponent();
-			render->Create(system, *trunk, &game_objects, "data/trunk.bmp");
-			(*trunk)->Create();
-			(*trunk)->AddComponent(behaviour);
-			(*trunk)->AddComponent(render);
-		}
-		trunks_pool_3.Create(5);
-		for (auto trunk = trunks_pool_3.pool.begin(); trunk != trunks_pool_3.pool.end(); trunk++)
-		{
-			TrunkBehaviourComponent * behaviour = new TrunkBehaviourComponent();
-			behaviour->Create(system, *trunk, &game_objects, false);
-			RenderComponent * render = new RenderComponent();
-			render->Create(system, *trunk, &game_objects, "data/trunk.bmp");
-			(*trunk)->Create();
-			(*trunk)->AddComponent(behaviour);
-			(*trunk)->AddComponent(render);
-		}
-		trunks_pool_4.Create(5);
-		for (auto trunk = trunks_pool_4.pool.begin(); trunk != trunks_pool_4.pool.end(); trunk++)
-		{
-			TrunkBehaviourComponent * behaviour = new TrunkBehaviourComponent();
-			behaviour->Create(system, *trunk, &game_objects, true);
-			RenderComponent * render = new RenderComponent();
-			render->Create(system, *trunk, &game_objects, "data/trunk.bmp");
-			(*trunk)->Create();
-			(*trunk)->AddComponent(behaviour);
-			(*trunk)->AddComponent(render);
-		}
-		trunks_pool_5.Create(5);
-		for (auto trunk = trunks_pool_5.pool.begin(); trunk != trunks_pool_5.pool.end(); trunk++)
-		{
-			TrunkBehaviourComponent * behaviour = new TrunkBehaviourComponent();
-			behaviour->Create(system, *trunk, &game_objects, false);
-			RenderComponent * render = new RenderComponent();
-			render->Create(system, *trunk, &game_objects, "data/trunk.bmp");
-			(*trunk)->Create();
-			(*trunk)->AddComponent(behaviour);
-			(*trunk)->AddComponent(render);
-		}
-		*/
 	}
 
 	virtual void Init()
@@ -346,14 +175,16 @@ public:
 		if (IsGameOver() || IsGameWon())
 			dt = 0.f;
 
-		bg->Update(dt);
+		// Updating bg before all other game objects to make sure it will always be drawn in the background
+		bg->Update(dt); 
 		for (auto go = game_objects.begin(); go != game_objects.end(); go++)
 			(*go)->Update(dt);
 
 		for (unsigned int lane = 0; lane < 5; lane++)
 		{
 			randomTrunk(lane);
-			randomCar(lane);
+			//randomCar(lane);
+			randomCar();
 		}
 	}
 
@@ -374,69 +205,53 @@ public:
 	}
 
 	// TODO: Car initialisation random car modularize by array
-	void randomCar(unsigned int lane)
+
+	void randomCar() 
 	{
-		switch (lane)
+		if (fRand(0, 1) < 0.1 && canCar())
 		{
-		case 0:
-			if (fRand(0, 1) < 0.07 && canCar())
+			Car * car = car_pool.FirstAvailable();
+			if (car != NULL)
 			{
-				Car * car = car_pool_1.FirstAvailable();
-				if (car != NULL)
-				{
-					car->Init(0, 565); //TODO: find coordinates for correct river lanes
-					game_objects.insert(car);
-				}
+				car->Init();
+				game_objects.insert(car);
 			}
-			break;
-		case 1:
-			if (fRand(0, 1) < 0.07 && canCar())
-			{
-				Car * car = car_pool_2.FirstAvailable();
-				if (car != NULL)
-				{
-					car->Init(640, 525); //TODO: find coordinates for correct river lanes
-					game_objects.insert(car);
-				}
-			}
-			break;
-		case 2:
-			if (fRand(0, 1) < 0.07 && canCar())
-			{
-				Car * car = car_pool_3.FirstAvailable();
-				if (car != NULL)
-				{
-					car->Init(0, 485); //TODO: find coordinates for correct river lanes
-					game_objects.insert(car);
-				}
-			}
-			break;
-		case 3:
-			if (fRand(0, 1) < 0.07 && canCar())
-			{
-				Car * car = car_pool_4.FirstAvailable();
-				if (car != NULL)
-				{
-					car->Init(640, 445); //TODO: find coordinates for correct river lanes
-					game_objects.insert(car);
-				}
-			}
-			break;
-		case 4:
-			if (fRand(0, 1) < 0.07 && canCar())
-			{
-				Car * car = car_pool_5.FirstAvailable();
-				if (car != NULL)
-				{
-					car->Init(0, 405); //TODO: find coordinates for correct river lanes
-					game_objects.insert(car);
-				}
-			}
-			break;
-		default:
-			return;
+				
 		}
 	}
+	/*
+	void randomCar(unsigned int lane)
+	{
+		if (fRand(0, 1) < 0.1 && canCar())
+		{
+			Car * car = car_pools[lane].FirstAvailable();
+			if (car != NULL)
+			{
+				switch (lane)
+				{
+				case 0:
+					car->Init(0, 565);
+					break;
+				case 1:
+					car->Init(640, 525);
+					break;
+				case 2:
+					car->Init(0, 485);
+					break;
+				case 3:
+					car->Init(640, 445);
+					break;
+				case 4:
+					car->Init(0, 405);
+					break;
+				default:
+					SDL_Log("error initialising car");
+					break;
+				}
+				game_objects.insert(car);
+			}
+		}
+	}*/
 
 	
 
@@ -505,25 +320,13 @@ public:
 
 		life_sprite->destroy();
 
-		/*
-		trunks_pool_1.Destroy();
-		trunks_pool_2.Destroy();
-		trunks_pool_3.Destroy();
-		trunks_pool_4.Destroy();
-		trunks_pool_5.Destroy();
-		*/
-		
-		car_pool_1.Destroy();
-		car_pool_2.Destroy();
-		car_pool_3.Destroy();
-		car_pool_4.Destroy();
-		car_pool_5.Destroy();
-		
+		// free memory
 		for (int i = 0; i < 5; i++)
 		{
 			trunk_pools[i].Destroy();
 		}
 		trunk_pools->Destroy();
+		car_pool.Destroy();
 
 		player->Destroy();
 		bg->Destroy();

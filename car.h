@@ -15,7 +15,7 @@ public:
 
 		if (go->horizontalPosition > 640)
 			go->enabled = false;
-		if (go->horizontalPosition < -250)
+		if (go->horizontalPosition < -100)
 			go->enabled = false;
 	}
 
@@ -33,15 +33,46 @@ public:
 
 class Car : public GameObject
 {
+	unsigned int lane;
 public:
+
 	virtual ~Car() { SDL_Log("Car::~Car"); }
 
-	virtual void Init(double xPos, double yPos)
+	virtual void Create(int lane) 
+	{
+		this->lane = lane;
+	}
+	virtual void Init(/*double xPos, double yPos*/)
 	{
 		SDL_Log("Car::Init");
 		GameObject::Init();
-		horizontalPosition = xPos;
-		verticalPosition = yPos;
+		/*horizontalPosition = xPos;
+		verticalPosition = yPos;*/
+		switch (lane)
+		{
+		case 0:
+			horizontalPosition = 0;
+			verticalPosition = 565;
+			break;
+		case 1:
+			horizontalPosition = 640;
+			verticalPosition = 525;
+			break;
+		case 2:
+			horizontalPosition = 0;
+			verticalPosition = 485;
+			break;
+		case 3:
+			horizontalPosition = 640;
+			verticalPosition = 445;
+			break;
+		case 4:
+			horizontalPosition = 0;
+			verticalPosition = 405;
+			break;
+		default:
+			return;
+		}
 	}
 
 };

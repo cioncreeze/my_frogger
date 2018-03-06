@@ -53,6 +53,7 @@ void CollideComponent::Update(float dt)
 				(go0->verticalPosition   > go->verticalPosition - 10) &&
 				(go0->verticalPosition   < go->verticalPosition + 10))
 			{
+				SDL_Log("Hit detected");
 				go->Receive(HIT);
 				go0->Receive(HIT);
 			}

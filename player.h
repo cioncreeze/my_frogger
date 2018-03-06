@@ -131,30 +131,7 @@ public:
 			go->horizontalPosition += move;
 			break;
 		}
-		/*
-		go->verticalPosition += move;
-
-		if (go->horizontalPosition > (640 - 32))
-			go->horizontalPosition = 640 - 32;
-			
-		if (go->horizontalPosition < 0)
-			go->horizontalPosition = 0;
-		*/
 	}
-
-	// return true if enough time has passed from the previous rocket
-	/*bool CanFire()
-	{
-		// shoot just if enough time passed by
-		if ((system->getElapsedTime() - time_fire_pressed) < (FIRE_TIME_INTERVAL / game_speed))
-			return false;
-
-		time_fire_pressed = system->getElapsedTime();
-
-		SDL_Log("fire!");
-		return true;
-	}*/
-
 	int CurrentLane()
 	{
 		return current_lane;

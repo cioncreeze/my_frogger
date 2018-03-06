@@ -15,7 +15,7 @@ public:
 
 		if (go->horizontalPosition > 640)
 			go->enabled = false;
-		if (go->horizontalPosition < -100)
+		if (go->horizontalPosition < -250)
 			go->enabled = false;
 	}
 
