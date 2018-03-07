@@ -19,9 +19,10 @@ class Game : public GameObject
 
 	Sprite * life_sprite;
 
-	/* keep track of froggers position, is he on the river & or a trunk*/
-	bool on_river; // 
-	bool on_trunk; //
+	// TODO: Deprecated?
+	/* keep track of froggers position, is he on the river & or a trunk
+	bool on_river;  
+	bool on_trunk; */
 
 	bool game_over; // TODO: implement proper game over calls
 	bool game_won;
@@ -63,7 +64,7 @@ public:
 
 		// TODO: create this river component for convenience
 
-		river_pool.Create(1);
+		this->river_pool.Create(1);
 		auto river = river_pool.pool.begin();
 		(*river)->Create(640, 200);
 
@@ -106,6 +107,7 @@ public:
 			(*car)->Create(counter % 5);
 			(*car)->AddComponent(behaviour);
 			(*car)->AddComponent(render);
+			(*car)->AddReceiver(this);
 			counter++;
 		}
 	}
@@ -126,6 +128,7 @@ public:
 			(*trunk)->Create(counter % 5);
 			(*trunk)->AddComponent(behaviour);
 			(*trunk)->AddComponent(render);
+			(*trunk)->AddReceiver(this);
 			counter++;
 		}
 	}
@@ -155,9 +158,9 @@ public:
 		enabled = true;
 		game_over = false;
 		game_won = false;
-
+		/* TODO: Deprecated
 		on_river = false;
-		on_trunk = false;
+		on_trunk = false;*/
 
 		player->Init();
 	}

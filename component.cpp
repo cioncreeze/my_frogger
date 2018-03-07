@@ -49,14 +49,23 @@ void CollideComponent::Update(float dt)
 		GameObject * go0 = coll_objects->pool[i];
 		if (go0->enabled)
 		{
-			if ((go0->horizontalPosition > go->horizontalPosition - 10) &&
+			/*if ((go0->horizontalPosition > go->horizontalPosition - 10) &&
 				(go0->horizontalPosition < go->horizontalPosition + 10) &&
 				(go0->verticalPosition   > go->verticalPosition - 10) &&
-				(go0->verticalPosition   < go->verticalPosition + 10))
+				(go0->verticalPosition   < go->verticalPosition + 10))*/
+			if ((go->horizontalPosition + go->horizontalSize - 5 >= go0->horizontalPosition) && 
+				(go->verticalPosition + go->verticalSize - 5 >= go0->verticalPosition) ||
+				(go0->horizontalPosition + go0->horizontalSize - 5 >= go->horizontalPosition) &&
+				(go0->verticalPosition + go0->verticalSize - 5 >= go->verticalPosition) ||
+				(go->horizontalPosition + go->horizontalSize - 5 >= go0->horizontalPosition) &&
+				(go->verticalPosition - 5 >= go0->verticalPosition + go0->verticalSize ) ||
+				(go->verticalPosition + go->verticalSize - 5 >= go0->verticalPosition) &&
+				(go0->horizontalPosition + go0->horizontalSize - 5 >= go->horizontalPosition))
 			{
 				SDL_Log("Hit detected");
-				go->Receive(HIT);
-				go0->Receive(HIT);
+				go->Receive(COLLISION);
+				go0->Receive(COLLISION);
+				break;
 			}
 		}
 	}

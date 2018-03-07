@@ -40,7 +40,6 @@ public:
 
 		if (keys.up)
 		{
-			//SDL_Log("up key is pressed");
 			if (!is_jumping)
 			{
 				is_jumping = true;
@@ -146,6 +145,8 @@ public:
 
 	int lives;	// it's game over when goes below zero 
 	// TODO: lives are actually frogs that have to go to the other side
+	bool on_river;
+	bool on_trunk;
 
 
 	virtual ~Player() { SDL_Log("Player::~Player"); }
@@ -164,11 +165,15 @@ public:
 
 	virtual void Receive(Message m) 
 	{
+		if (m == ONRIVER)
+			this->on_river = true;
+		if (m == ONTRUNK)
+			this->on_trunk = true;
+
 		if (m == HIT)
 		{ 
 			SDL_Log("Player::Hit!");
 			RemoveLife();
-
 			if (lives < 0)
 				Send(GAME_OVER);
 			this->Init();

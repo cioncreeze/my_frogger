@@ -40,7 +40,8 @@ public:
 
 	virtual void Receive(Message m)
 	{
-		//stub
+		if (m == COLLISION)
+			this->Send(ONRIVER);
 	}
 
 };

@@ -29,24 +29,6 @@ bool AvancezLib::init(int width, int height)
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Renderer could not be created! SDL Error: %s\n", SDL_GetError());
 		return false;
 	}
-	/*
-	// initialising the background
-	background = SDL_LoadBMP("data/background.bmp");
-	if (background == NULL)
-	{
-		SDL_ShowSimpleMessageBox(0, "Background init error", SDL_GetError(), window);
-	}
-
-	// pls workerino
-	bg_texture = SDL_CreateTextureFromSurface(renderer, background);
-	if (bg_texture == NULL)
-	{
-		SDL_ShowSimpleMessageBox(0, "Texture init error", SDL_GetError(), window);
-	}
-
-	SDL_RenderCopy(renderer, bg_texture, NULL, NULL);
-	SDL_RenderPresent(renderer);
-	/**/
 	TTF_Init();
 	font = TTF_OpenFont("data/space_invaders.ttf", 12); //this opens a font style and sets a size
 	if (font == NULL)
@@ -139,11 +121,6 @@ bool AvancezLib::update()
 		}
 
 	}
-
-	//Update screen
-	//SDL_RenderPresent(renderer);
-	//SDL_RenderClear(renderer);
-	//SDL_RenderCopy(renderer, bg_texture, NULL, NULL);
 	
 	SDL_RenderPresent(renderer);
 	

@@ -75,4 +75,9 @@ public:
 		}
 	}
 
+	virtual void Receive(Message m) 
+	{
+		if (m == COLLISION)
+			this->Send(HIT);
+	}
 };
