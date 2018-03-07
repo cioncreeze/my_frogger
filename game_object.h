@@ -15,10 +15,13 @@ protected:
 public:
 	double horizontalPosition;
 	double verticalPosition;
+	double horizontalSize;
+	double verticalSize;
 	bool enabled;
 
 	virtual ~GameObject();
 
+	virtual void Create(float horizontalSize, float verticalSize);
 	virtual void Create();
 	virtual void AddComponent(Component * component);
 

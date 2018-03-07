@@ -2,11 +2,22 @@
 #include "component.h"
 #include "avancezlib.h"
 
+void GameObject::Create(float horizontalSize, float verticalSize)
+{
+	SDL_Log("GameObject::Create");
+
+	enabled = false;
+	this->horizontalSize = horizontalSize;
+	this->verticalSize = verticalSize;
+}
+
 void GameObject::Create()
 {
 	SDL_Log("GameObject::Create");
 
 	enabled = false;
+	this->horizontalSize = 0;
+	this->verticalSize = 0;
 }
 
 void GameObject::AddComponent(Component * component)

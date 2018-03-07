@@ -3,7 +3,7 @@
 class PlayerBehaviourComponent : public Component
 {
 	bool is_jumping;
-	unsigned int current_lane;
+	// unsigned int current_lane; // TODO: Deprecated? 
 	Dir dir;
 	unsigned int start_position;
 
@@ -20,7 +20,7 @@ public:
 		//go->horizontalPosition = 320 -18;
 		//go->verticalPosition = 640 - 36;
 		is_jumping = false;
-		current_lane = 1;
+		//current_lane = 1; // TODO: Deprecated?
 		//time_fire_pressed = -10000.f;
 		dir = UP;
 		start_position = 0;
@@ -33,10 +33,10 @@ public:
 		AvancezLib::KeyStatus keys;
 		system->getKeyStatus(keys);
 		
-		if (current_lane == 10)
+		/* if (current_lane == 10) // TODO: Deprecated
 		{
 			go->Send(FROGGER_SAVED);
-		}
+		} */
 
 		if (keys.up)
 		{
@@ -132,10 +132,10 @@ public:
 			break;
 		}
 	}
-	int CurrentLane()
+	/*int CurrentLane() // TODO: Deprecated?
 	{
 		return current_lane;
-	}
+	}*/
 };
 
 
@@ -172,8 +172,6 @@ public:
 			if (lives < 0)
 				Send(GAME_OVER);
 			this->Init();
-
-
 		}
 	}
 

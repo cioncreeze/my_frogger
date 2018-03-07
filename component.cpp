@@ -41,6 +41,7 @@ void CollideComponent::Create(AvancezLib* system, GameObject * go, std::set<Game
 
 
 
+
 void CollideComponent::Update(float dt)
 {
 	for (auto i = 0; i < coll_objects->pool.size(); i++)

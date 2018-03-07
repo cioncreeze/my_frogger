@@ -10,14 +10,19 @@ class Game : public GameObject
 
 	ObjectPool<Car> car_pool;
 	ObjectPool<Trunk> trunk_pool;
-	//ObjectPool<Trunk> trunk_pools[5];
-	//ObjectPool<Car> car_pools[5];
+	ObjectPool<River> river_pool; // I need this because then I can use the collide component without changing to much shit 
 
 	Player * player;
 
+	River * river; 
 	Background * bg;
 
 	Sprite * life_sprite;
+
+	/* keep track of froggers position, is he on the river & or a trunk*/
+	bool on_river; // 
+	bool on_trunk; //
+
 	bool game_over; // TODO: implement proper game over calls
 	bool game_won;
 
@@ -56,9 +61,23 @@ public:
 		player->AddReceiver(this);
 		game_objects.insert(player);
 
+		// TODO: create this river component for convenience
+
+		river_pool.Create(1);
+		auto river = river_pool.pool.begin();
+		(*river)->Create(640, 200);
+
+		CollideComponent * player_river_collider = new CollideComponent();
+		player_river_collider->Create(system, player, &game_objects, (ObjectPool<GameObject>*)&river_pool);
+		player->AddComponent(player_river_collider);
+
 		CollideComponent * player_car_collider = new CollideComponent();
 		player_car_collider->Create(system, player, &game_objects, (ObjectPool<GameObject>*)&car_pool);
 		player->AddComponent(player_car_collider);
+
+		CollideComponent * player_trunk_collider = new CollideComponent();
+		player_trunk_collider->Create(system, player, &game_objects, (ObjectPool<GameObject>*)&trunk_pool);
+		player->AddComponent(player_trunk_collider);
 		// TODO: DO NOT FORGET TO PROPERLY FREE MEMORY
 		// creates trunks in the river
 		initialiseTrunks();
@@ -110,24 +129,6 @@ public:
 			counter++;
 		}
 	}
-	
-	// TODO: refactor car and trunk pool creation to be modular
-	/*ObjectPool<Trunk> * initialiseTrunkPool(bool mvlft)
-	{
-		ObjectPool<Trunk> * trnk_pl = new ObjectPool<Trunk>();
-		trnk_pl->Create(5);
-		for (auto trnk = trnk_pl->pool.begin(); trnk != trnk_pl->pool.end(); trnk++)
-		{
-			TrunkBehaviourComponent * behaviour = new TrunkBehaviourComponent();
-			behaviour->Create(system, *trnk, &game_objects, mvlft);
-			RenderComponent * render = new RenderComponent();
-			render->Create(system, *trnk, &game_objects, "data/trunk.bmp");
-			(*trnk)->Create();
-			(*trnk)->AddComponent(behaviour);
-			(*trnk)->AddComponent(render);
-		}
-		return trnk_pl;
-	}*/
 
 	void randomTrunk(unsigned int lane)
 	{
@@ -143,17 +144,6 @@ public:
 		}
 	}
 
-	/*void initialiseTrunks()
-	{
-		for (unsigned int pool = 0; pool < 5; pool++) 
-		{
-			if (pool % 2 == 0)
-				trunk_pools[pool] = *initialiseTrunkPool(false);
-			else
-				trunk_pools[pool] = *initialiseTrunkPool(true);
-		}
-	}
-	*/
 	virtual void Init()
 	{
 		time_trunk_launched = -10000.f;
@@ -165,6 +155,9 @@ public:
 		enabled = true;
 		game_over = false;
 		game_won = false;
+
+		on_river = false;
+		on_trunk = false;
 
 		player->Init();
 	}
@@ -214,8 +207,7 @@ public:
 			{
 				car->Init();
 				game_objects.insert(car);
-			}
-				
+			}	
 		}
 	}
 
@@ -284,12 +276,6 @@ public:
 
 		life_sprite->destroy();
 
-		// free memory
-		/*for (int i = 0; i < 5; i++)
-		{
-			trunk_pools[i].Destroy();
-		}
-		trunk_pools->Destroy();*/
 		trunk_pool.Destroy();
 		car_pool.Destroy();
 
