@@ -51,12 +51,13 @@ public:
 
 		// player creation, component creation
 		player = new Player();
+		player->Create(FROGGER_H_SIZE, FROGGER_V_SIZE);
 		PlayerBehaviourComponent * player_behaviour = new PlayerBehaviourComponent();
-		player_behaviour->Create(system, player, &game_objects);
+		player_behaviour->Create(system, player, &game_objects, player->on_river, player->on_trunk);
 		RenderComponent * player_render = new RenderComponent();
 		player_render->Create(system, player, &game_objects, "data/frogger.bmp");
 		// player setup, components added
-		player->Create();
+		//player->Create(FROGGER_H_SIZE, FROGGER_V_SIZE);
 		player->AddComponent(player_behaviour);
 		player->AddComponent(player_render);
 		player->AddReceiver(this);
@@ -66,7 +67,7 @@ public:
 
 		this->river_pool.Create(1);
 		auto river = river_pool.pool.begin();
-		(*river)->Create(640, 200);
+		(*river)->Create(RIVER_H_SIZE, RIVER_V_SIZE);
 
 		CollideComponent * player_river_collider = new CollideComponent();
 		player_river_collider->Create(system, player, &game_objects, (ObjectPool<GameObject>*)&river_pool);
@@ -104,7 +105,7 @@ public:
 			behaviour->Create(system, *car, &game_objects, mvlft);
 			RenderComponent * render = new RenderComponent();
 			render->Create(system, *car, &game_objects, "data/car.bmp");
-			(*car)->Create(counter % 5);
+			(*car)->Create(CAR_H_SIZE, CAR_V_SIZE, counter % 5);
 			(*car)->AddComponent(behaviour);
 			(*car)->AddComponent(render);
 			(*car)->AddReceiver(this);
@@ -125,7 +126,7 @@ public:
 			behaviour->Create(system, *trunk, &game_objects, mvlft);
 			RenderComponent * render = new RenderComponent();
 			render->Create(system, *trunk, &game_objects, "data/trunk.bmp");
-			(*trunk)->Create(counter % 5);
+			(*trunk)->Create(TRUNK_H_SIZE, TRUNK_V_SIZE, counter % 5);
 			(*trunk)->AddComponent(behaviour);
 			(*trunk)->AddComponent(render);
 			(*trunk)->AddReceiver(this);

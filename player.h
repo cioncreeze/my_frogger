@@ -3,6 +3,8 @@
 class PlayerBehaviourComponent : public Component
 {
 	bool is_jumping;
+	bool * on_river;
+	bool * on_trunk;
 	// unsigned int current_lane; // TODO: Deprecated? 
 	Dir dir;
 	unsigned int start_position;
@@ -10,9 +12,12 @@ class PlayerBehaviourComponent : public Component
 public:
 	virtual ~PlayerBehaviourComponent() {}
 
-	virtual void Create(AvancezLib* system, GameObject * go, std::set<GameObject*> * game_objects)
+	virtual void Create(AvancezLib* system, GameObject * go, std::set<GameObject*> * game_objects, bool * onrvr, bool * ontrnk)
 	{
 		Component::Create(system, go, game_objects);
+		// ohmygawd this is so ugly
+		on_river = onrvr;
+		on_trunk = ontrnk;
 	}
 
 	virtual void Init()
@@ -20,8 +25,6 @@ public:
 		//go->horizontalPosition = 320 -18;
 		//go->verticalPosition = 640 - 36;
 		is_jumping = false;
-		//current_lane = 1; // TODO: Deprecated?
-		//time_fire_pressed = -10000.f;
 		dir = UP;
 		start_position = 0;
 	}
@@ -33,10 +36,9 @@ public:
 		AvancezLib::KeyStatus keys;
 		system->getKeyStatus(keys);
 		
-		/* if (current_lane == 10) // TODO: Deprecated
-		{
-			go->Send(FROGGER_SAVED);
-		} */
+		// TODO: Check if frogger is on a log or in the river
+		//if (*on_river && !(*on_trunk))
+			// frogger dies -> reset.
 
 		if (keys.up)
 		{
@@ -99,12 +101,14 @@ public:
 				is_jumping = false;
 			}
 		}
-		// TODO: Check if frogger is on a log or in the river
 
+		*on_river = false;
+		*on_trunk = false;
+		/* TODO: Deprecated
 		if (go->verticalPosition < 325 && go->verticalPosition > 125)
 		{
 			go->Send(GAME_OVER);
-		}
+		}*/
 		if (go->verticalPosition < 125)
 			go->Send(FROGGER_SAVED);
 	}
@@ -131,10 +135,6 @@ public:
 			break;
 		}
 	}
-	/*int CurrentLane() // TODO: Deprecated?
-	{
-		return current_lane;
-	}*/
 };
 
 
@@ -145,30 +145,37 @@ public:
 
 	int lives;	// it's game over when goes below zero 
 	// TODO: lives are actually frogs that have to go to the other side
-	bool on_river;
-	bool on_trunk;
+	bool * on_river;
+	bool * on_trunk;
 
 
 	virtual ~Player() { SDL_Log("Player::~Player"); }
 
-	virtual void Create()
+	virtual void Create(float hSize, float vSize)
 	{
 		lives = NUM_LIVES;
+		// allocate two new booleans then set them to false, only god knows why
+		on_river = new bool;
+		on_trunk = new bool;
+		*on_river = false;
+		*on_trunk = false;
 	}
 	virtual void Init()
 	{
 		SDL_Log("Player::Init");
 		GameObject::Init();
-		horizontalPosition = 320 - 18;
-		verticalPosition = 640 - 36;
+		this->horizontalPosition = 320 - 18;
+		this->verticalPosition = 640 - 36;
 	}
 
 	virtual void Receive(Message m) 
 	{
+		if (!enabled)
+			return;
 		if (m == ONRIVER)
-			this->on_river = true;
+			*on_river = true;
 		if (m == ONTRUNK)
-			this->on_trunk = true;
+			*on_trunk = true;
 
 		if (m == HIT)
 		{ 

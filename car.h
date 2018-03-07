@@ -38,9 +38,11 @@ public:
 
 	virtual ~Car() { SDL_Log("Car::~Car"); }
 
-	virtual void Create(int lane) 
+	virtual void Create(float hSize, float vSize, int lane)
 	{
 		this->lane = lane;
+		this->horizontalSize = hSize;
+		this->verticalSize = vSize;
 	}
 	virtual void Init(/*double xPos, double yPos*/)
 	{
@@ -77,6 +79,9 @@ public:
 
 	virtual void Receive(Message m) 
 	{
+		SDL_Log("car recieving message");
+		if (!enabled)
+			return;
 		if (m == COLLISION)
 			this->Send(HIT);
 	}

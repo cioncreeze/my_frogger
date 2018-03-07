@@ -53,19 +53,14 @@ void CollideComponent::Update(float dt)
 				(go0->horizontalPosition < go->horizontalPosition + 10) &&
 				(go0->verticalPosition   > go->verticalPosition - 10) &&
 				(go0->verticalPosition   < go->verticalPosition + 10))*/
-			if ((go->horizontalPosition + go->horizontalSize - 5 >= go0->horizontalPosition) && 
-				(go->verticalPosition + go->verticalSize - 5 >= go0->verticalPosition) ||
-				(go0->horizontalPosition + go0->horizontalSize - 5 >= go->horizontalPosition) &&
-				(go0->verticalPosition + go0->verticalSize - 5 >= go->verticalPosition) ||
-				(go->horizontalPosition + go->horizontalSize - 5 >= go0->horizontalPosition) &&
-				(go->verticalPosition - 5 >= go0->verticalPosition + go0->verticalSize ) ||
-				(go->verticalPosition + go->verticalSize - 5 >= go0->verticalPosition) &&
-				(go0->horizontalPosition + go0->horizontalSize - 5 >= go->horizontalPosition))
+			if (!(go->verticalPosition + go->verticalSize < go0->verticalPosition ||
+				go0->verticalPosition + go0->verticalSize < go->verticalPosition ||
+				go->horizontalPosition + go->horizontalSize < go0->horizontalPosition ||
+				go0->horizontalPosition + go0->horizontalSize < go->horizontalPosition))
 			{
 				SDL_Log("Hit detected");
-				go->Receive(COLLISION);
+				go->Receive(COLLISION); // TODO: maybe this can be removed to increase performance
 				go0->Receive(COLLISION);
-				break;
 			}
 		}
 	}

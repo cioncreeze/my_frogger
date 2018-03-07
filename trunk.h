@@ -37,16 +37,14 @@ public:
 	//bool move_left;
 	virtual ~Trunk() { SDL_Log("Trunk::~Trunk"); }
 	
-	virtual void Create(unsigned int lane)
+	virtual void Create(float hSize, float vSize, unsigned int lane)
 	{
 		this->lane = lane;
 	}
-	virtual void Init(/*double xPos, double yPos*/)
+	virtual void Init()
 	{
 		SDL_Log("Trunk::Init");
 		GameObject::Init();
-		/*horizontalPosition = xPos;
-		verticalPosition = yPos;*/
 		switch (lane)
 		{
 		case 0:
@@ -74,4 +72,11 @@ public:
 		}
 	}
 
+	virtual void Receive(Message m)
+	{
+		if (!enabled)
+			return;
+		if (m == COLLISION)
+			this->Send(ONTRUNK);
+	}
 };
