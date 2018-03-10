@@ -14,8 +14,7 @@ public:
 
 	virtual void Init()
 	{
-		go->verticalPosition = 0;
-		go->horizontalPosition = 0;
+
 	}
 
 	virtual void Update(float dt)
@@ -32,14 +31,24 @@ public:
 
 	virtual ~River() { SDL_Log("River::~River"); }
 
+	virtual void Create(float hSize, float vSize)
+	{
+		this->horizontalPosition = 0;
+		this->verticalPosition = 160;
+		this->horizontalSize = hSize;
+		this->verticalSize = vSize;
+	}
+
 	virtual void Init()
 	{
+		this->enabled = true;
 		SDL_Log("River::Init");
 		GameObject::Init();
 	}
 
 	virtual void Receive(Message m)
 	{
+		SDL_Log("River recieving a message");
 		if (m == COLLISION)
 			this->Send(ONRIVER);
 	}

@@ -49,16 +49,12 @@ void CollideComponent::Update(float dt)
 		GameObject * go0 = coll_objects->pool[i];
 		if (go0->enabled)
 		{
-			/*if ((go0->horizontalPosition > go->horizontalPosition - 10) &&
-				(go0->horizontalPosition < go->horizontalPosition + 10) &&
-				(go0->verticalPosition   > go->verticalPosition - 10) &&
-				(go0->verticalPosition   < go->verticalPosition + 10))*/
-			if (!(go->verticalPosition + go->verticalSize < go0->verticalPosition ||
-				go0->verticalPosition + go0->verticalSize < go->verticalPosition ||
-				go->horizontalPosition + go->horizontalSize < go0->horizontalPosition ||
-				go0->horizontalPosition + go0->horizontalSize < go->horizontalPosition))
+			if (!(((go->verticalPosition + go->verticalSize) < go0->verticalPosition) ||
+				((go0->verticalPosition + go0->verticalSize) < go->verticalPosition) ||
+				((go->horizontalPosition + go->horizontalSize) < go0->horizontalPosition) ||
+				((go0->horizontalPosition + go0->horizontalSize) < go->horizontalPosition)))
 			{
-				SDL_Log("Hit detected");
+				// SDL_Log("Collision detected");
 				go->Receive(COLLISION); // TODO: maybe this can be removed to increase performance
 				go0->Receive(COLLISION);
 			}

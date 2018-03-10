@@ -11,6 +11,7 @@ class Game : public GameObject
 	ObjectPool<Car> car_pool;
 	ObjectPool<Trunk> trunk_pool;
 	ObjectPool<River> river_pool; // I need this because then I can use the collide component without changing to much shit 
+	ObjectPool<Home> home_pool;
 
 	Player * player;
 
@@ -47,13 +48,13 @@ public:
 		bg->Create();
 		bg->AddComponent(bg_behaviour);
 		bg->AddComponent(bg_render);
-		bg->AddReceiver(this);
+		// bg->AddReceiver(this); TODO: deprecated?
 
 		// player creation, component creation
 		player = new Player();
 		player->Create(FROGGER_H_SIZE, FROGGER_V_SIZE);
 		PlayerBehaviourComponent * player_behaviour = new PlayerBehaviourComponent();
-		player_behaviour->Create(system, player, &game_objects, player->on_river, player->on_trunk);
+		player_behaviour->Create(system, player, &game_objects, player->on_river, player->on_trunk, player->trunk_move_left);
 		RenderComponent * player_render = new RenderComponent();
 		player_render->Create(system, player, &game_objects, "data/frogger.bmp");
 		// player setup, components added
@@ -66,8 +67,14 @@ public:
 		// TODO: create this river component for convenience
 
 		this->river_pool.Create(1);
-		auto river = river_pool.pool.begin();
-		(*river)->Create(RIVER_H_SIZE, RIVER_V_SIZE);
+		auto rvr = river_pool.pool.begin();
+		(*rvr)->Create(RIVER_H_SIZE, RIVER_V_SIZE);
+		(*rvr)->Init();
+		game_objects.insert(*rvr);
+		//river = *rvr;
+		// Make the player receive messages from the river
+		(*rvr)->AddReceiver(player);
+
 
 		CollideComponent * player_river_collider = new CollideComponent();
 		player_river_collider->Create(system, player, &game_objects, (ObjectPool<GameObject>*)&river_pool);
@@ -80,11 +87,18 @@ public:
 		CollideComponent * player_trunk_collider = new CollideComponent();
 		player_trunk_collider->Create(system, player, &game_objects, (ObjectPool<GameObject>*)&trunk_pool);
 		player->AddComponent(player_trunk_collider);
+
+		CollideComponent * player_home_collider = new CollideComponent();
+		player_home_collider->Create(system, player, &game_objects, (ObjectPool<GameObject>*)&home_pool);
+		player->AddComponent(player_home_collider);
+
 		// TODO: DO NOT FORGET TO PROPERLY FREE MEMORY
 		// creates trunks in the river
 		initialiseTrunks();
 		// creates cars on the street
 		initialiseCars();
+		// create the frogger homes
+		initialiseHomes();
 
 		// TODO: create 5 lanes of  gators, turtles, snakes
 
@@ -92,6 +106,22 @@ public:
 		score = 0;
 	}
 	
+	void initialiseHomes()
+	{
+		home_pool.Create(5);
+		float home_location_vertical = 120.f;
+		float home_location_horizontal = 60.f;
+		for (auto home = home_pool.pool.begin(); home != home_pool.pool.end(); home++)
+		{
+			(*home)->Create(home_location_horizontal, home_location_vertical, HOME_H_SIZE, HOME_V_SIZE);
+			(*home)->AddReceiver(player);
+			RenderComponent * home_occupied_render = new RenderComponent();
+			home_occupied_render->Create(system, *home, &game_objects, "data/home_pond_occupied.bmp");
+			(*home)->AddComponent(home_occupied_render);
+			home_location_horizontal += 120.f;
+		}
+	}
+
 	void initialiseCars()
 	{
 		car_pool.Create(25);
@@ -109,6 +139,7 @@ public:
 			(*car)->AddComponent(behaviour);
 			(*car)->AddComponent(render);
 			(*car)->AddReceiver(this);
+			(*car)->AddReceiver(player);
 			counter++;
 		}
 	}
@@ -130,11 +161,12 @@ public:
 			(*trunk)->AddComponent(behaviour);
 			(*trunk)->AddComponent(render);
 			(*trunk)->AddReceiver(this);
+			(*trunk)->AddReceiver(player);
 			counter++;
 		}
 	}
 
-	void randomTrunk(unsigned int lane)
+	void randomTrunk()
 	{
 		if (fRand(0, 1) < 0.1 && canTrunk())
 		{
@@ -142,7 +174,7 @@ public:
 			if (trunk != NULL)
 			{
 				trunk->Init();
-				game_objects.insert(trunk);
+				//game_objects.insert(trunk);
 			}
 
 		}
@@ -155,13 +187,13 @@ public:
 
 
 		bg->Init();
-		
+		for (auto home = home_pool.pool.begin(); home != home_pool.pool.end(); home++)
+		{
+			(*home)->Init();
+		}
 		enabled = true;
 		game_over = false;
 		game_won = false;
-		/* TODO: Deprecated
-		on_river = false;
-		on_trunk = false;*/
 
 		player->Init();
 	}
@@ -173,13 +205,22 @@ public:
 
 		// Updating bg before all other game objects to make sure it will always be drawn in the background
 		bg->Update(dt); 
+		for (auto trunk = trunk_pool.pool.begin(); trunk != trunk_pool.pool.end(); trunk++)
+		{
+			(*trunk)->Update(dt);
+		}
+		for (auto car = car_pool.pool.begin(); car != car_pool.pool.end(); car++)
+		{
+			(*car)->Update(dt);
+		}
+		for (auto home = home_pool.pool.begin(); home != home_pool.pool.end(); home++)
+			(*home)->Update(dt);
 		for (auto go = game_objects.begin(); go != game_objects.end(); go++)
 			(*go)->Update(dt);
 
 		for (unsigned int lane = 0; lane < 5; lane++)
 		{
-			randomTrunk(lane);
-			//randomCar(lane);
+			randomTrunk();
 			randomCar();
 		}
 	}
@@ -210,7 +251,7 @@ public:
 			if (car != NULL)
 			{
 				car->Init();
-				game_objects.insert(car);
+				//game_objects.insert(car);
 			}	
 		}
 	}

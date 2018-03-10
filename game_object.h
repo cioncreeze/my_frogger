@@ -1,7 +1,7 @@
 // GameObject represents objects which moves are drawn
 #include <vector>
 
-enum Message { HIT, ALIEN_HIT, GAME_OVER, LEVEL_WIN, NO_MSG, FROGGER_SAVED, COLLISION, ONRIVER, ONTRUNK };
+enum Message { HIT, ALIEN_HIT, GAME_OVER, LEVEL_WIN, NO_MSG, FROGGER_SAVED, COLLISION, ONRIVER, ONTRUNK, MOVE_LEFT, REMOVE_LIFE, AT_HOME };
 enum Dir { UP, LEFT, DOWN, RIGHT };
 
 class Component;

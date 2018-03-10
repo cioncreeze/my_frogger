@@ -21,6 +21,7 @@ public:
 
 	void Move(float move)
 	{
+		SDL_Log("move of trunk is: %f ", move);
 		if (move_left)
 			go->horizontalPosition -= move;
 		else
@@ -34,11 +35,13 @@ class Trunk : public GameObject
 {
 	unsigned int lane;
 public:
-	//bool move_left;
+	bool move_left;
 	virtual ~Trunk() { SDL_Log("Trunk::~Trunk"); }
 	
 	virtual void Create(float hSize, float vSize, unsigned int lane)
 	{
+		this->horizontalSize = hSize;
+		this->verticalSize = vSize;
 		this->lane = lane;
 	}
 	virtual void Init()
@@ -50,22 +53,27 @@ public:
 		case 0:
 			horizontalPosition = 0;
 			verticalPosition = 325;
+			move_left = false;
 			break;
 		case 1:
 			horizontalPosition = 640;
 			verticalPosition = 285;
+			move_left = true;
 			break;
 		case 2:
 			horizontalPosition = 0;
 			verticalPosition = 245;
+			move_left = false;
 			break;
 		case 3:
 			horizontalPosition = 640;
 			verticalPosition = 205;
+			move_left = true;
 			break;
 		case 4:
 			horizontalPosition = 0;
 			verticalPosition = 165;
+			move_left = false;
 			break;
 		default:
 			return;
@@ -77,6 +85,10 @@ public:
 		if (!enabled)
 			return;
 		if (m == COLLISION)
+		{
 			this->Send(ONTRUNK);
+			if (move_left)
+				this->Send(MOVE_LEFT);
+		}
 	}
 };
