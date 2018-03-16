@@ -54,9 +54,6 @@
     <ClInclude Include="turtle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="aligator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="home.h">
       <Filter>Header Files</Filter>
     </ClInclude>

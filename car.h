@@ -44,16 +44,14 @@ public:
 		this->horizontalSize = hSize;
 		this->verticalSize = vSize;
 	}
-	virtual void Init(/*double xPos, double yPos*/)
+	virtual void Init() // lanes are hardcoded by initial position
 	{
 		SDL_Log("Car::Init");
 		GameObject::Init();
-		/*horizontalPosition = xPos;
-		verticalPosition = yPos;*/
 		switch (lane)
 		{
 		case 0:
-			horizontalPosition = 0;
+			horizontalPosition = -40;
 			verticalPosition = 565;
 			break;
 		case 1:
@@ -61,7 +59,7 @@ public:
 			verticalPosition = 525;
 			break;
 		case 2:
-			horizontalPosition = 0;
+			horizontalPosition = -40;
 			verticalPosition = 485;
 			break;
 		case 3:
@@ -69,7 +67,7 @@ public:
 			verticalPosition = 445;
 			break;
 		case 4:
-			horizontalPosition = 0;
+			horizontalPosition = 40;
 			verticalPosition = 405;
 			break;
 		default:

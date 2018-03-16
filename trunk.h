@@ -21,7 +21,6 @@ public:
 
 	void Move(float move)
 	{
-		SDL_Log("move of trunk is: %f ", move);
 		if (move_left)
 			go->horizontalPosition -= move;
 		else
@@ -44,14 +43,14 @@ public:
 		this->verticalSize = vSize;
 		this->lane = lane;
 	}
-	virtual void Init()
+	virtual void Init() // lanes for the trunks are hardcoded by initial position
 	{
 		SDL_Log("Trunk::Init");
 		GameObject::Init();
 		switch (lane)
 		{
 		case 0:
-			horizontalPosition = 0;
+			horizontalPosition = -100;
 			verticalPosition = 325;
 			move_left = false;
 			break;
@@ -61,7 +60,7 @@ public:
 			move_left = true;
 			break;
 		case 2:
-			horizontalPosition = 0;
+			horizontalPosition = -100;
 			verticalPosition = 245;
 			move_left = false;
 			break;
@@ -71,7 +70,7 @@ public:
 			move_left = true;
 			break;
 		case 4:
-			horizontalPosition = 0;
+			horizontalPosition = -100;
 			verticalPosition = 165;
 			move_left = false;
 			break;
@@ -84,7 +83,7 @@ public:
 	{
 		if (!enabled)
 			return;
-		if (m == COLLISION)
+		if (m == COLLISION) // if a collision between the player and a trunk is detected then inform the receivers thusly
 		{
 			this->Send(ONTRUNK);
 			if (move_left)

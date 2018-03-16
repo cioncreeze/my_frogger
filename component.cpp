@@ -54,8 +54,7 @@ void CollideComponent::Update(float dt)
 				((go->horizontalPosition + go->horizontalSize) < go0->horizontalPosition) ||
 				((go0->horizontalPosition + go0->horizontalSize) < go->horizontalPosition)))
 			{
-				// SDL_Log("Collision detected");
-				go->Receive(COLLISION); // TODO: maybe this can be removed to increase performance
+				go->Receive(COLLISION);
 				go0->Receive(COLLISION);
 			}
 		}

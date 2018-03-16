@@ -2,8 +2,6 @@
 
 class RiverBehaviourComponent : public Component
 {
-	// TODO: member variables?
-
 public:
 	virtual ~RiverBehaviourComponent() {}
 
@@ -48,9 +46,8 @@ public:
 
 	virtual void Receive(Message m)
 	{
-		SDL_Log("River recieving a message");
 		if (m == COLLISION)
-			this->Send(ONRIVER);
+			this->Send(ONRIVER); // notifying the receivers, that the frog is on the river
 	}
 
 };

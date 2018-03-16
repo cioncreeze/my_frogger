@@ -2,8 +2,6 @@
 
 class BackGroundBehaviourComponent : public Component
 {
-	// TODO: member variables?
-
 public:
 	virtual ~BackGroundBehaviourComponent() {}
 
@@ -27,9 +25,6 @@ public:
 class Background : public GameObject
 {
 public:
-
-	
-
 	virtual ~Background() { SDL_Log("Background::~Background"); }
 
 	virtual void Init()
@@ -37,11 +32,5 @@ public:
 		SDL_Log("Background::Init");
 		GameObject::Init();
 	}
-
-	virtual void Receive(Message m)
-	{
-		//stub
-	}
-
 };
 

@@ -152,7 +152,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="aligator.h" />
     <ClInclude Include="avancezlib.h" />
     <ClInclude Include="background.h" />
     <ClInclude Include="car.h" />
